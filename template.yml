@@ -20,15 +20,10 @@ Parameters:
   LatestAmiId:
     Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
     Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
-  SecurityGroup:
-    Type: "AWS::SSM::Parameter::Value<AWS::EC2::SecurityGroup::Id>"
-    Default: "/CNS/resources/mgmt_sg"
   Subnets:
-    Type: "AWS::SSM::Parameter::Value<List<AWS::EC2::Subnet::Id>>"
-    Default: "/CNS/resources/subnets/mgmt/primary"
+    Type: CommaDelimitedList
   VPCID:
-    Type: "AWS::SSM::Parameter::Value<String>"
-    Default: "/CNS/resources/vpc_id"
+    Type: String
 Resources:   # Add Resource here
   LaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
@@ -37,11 +32,9 @@ Resources:   # Add Resource here
         ImageId: !Ref LatestAmiId
         InstanceType: t2.micro
         IamInstanceProfile:
-          # Arn: !GetAtt InstanceProfile.Arn
-          Arn: !Sub "arn:aws:iam::${AWS::AccountId}:instance-profile/BootstrapDefaultInstanceProfile"
+          Arn: !GetAtt InstanceProfile.Arn
         SecurityGroupIds: 
           - !GetAtt SG.GroupId
-          - !Ref SecurityGroup
       
   ASG:
     Type: AWS::AutoScaling::AutoScalingGroup
@@ -105,45 +98,3 @@ Resources:   # Add Resource here
       Path: /
       Roles:
         - !Ref Role
-
-
-  # ScalingPolicyBasedOnCPU:
-  #   Type: 'AWS::AutoScaling::ScalingPolicy'
-  #   Properties:
-  #     AutoScalingGroupName: !Ref myASG
-  #     PolicyType: TargetTrackingScaling
-  #     TargetTrackingConfiguration:
-  #       PredefinedMetricSpecification:
-  #         PredefinedMetricType: ASGAverageCPUUtilization
-  #       TargetValue: 10
-  #     EstimatedInstanceWarmup: 60
-
-  # ScalingPolicyBasedOnALBRequest:
-  #   Type: 'AWS::AutoScaling::ScalingPolicy'
-  #   Properties:
-  #     AutoScalingGroupName: !Ref myASG
-  #     PolicyType: TargetTrackingScaling
-  #     TargetTrackingConfiguration:
-  #       PredefinedMetricSpecification:
-  #         PredefinedMetricType: ALBRequestCountPerTarget
-  #         # ResourceLabel: !Join 
-  #         #   - '/' 
-  #         #   - - !GetAtt myLoadBalancer.LoadBalancerFullName
-  #         #     - !GetAtt myASG.TargetGroupFullName
-  #       TargetValue: 5
-  #     EstimatedInstanceWarmup: 60
-
-  # Scaling based on a schedule
-  # RecurringScheduledActionUp:
-  #   Type: 'AWS::AutoScaling::ScheduledAction'
-  #   Properties:
-  #     AutoScalingGroupName: !Ref myASG
-  #     DesiredCapacity: 2
-  #     Recurrence: '0 8 * * *'
-
-  # RecurringScheduledActionDown:
-  #   Type: 'AWS::AutoScaling::ScheduledAction'
-  #   Properties:
-  #     AutoScalingGroupName: !Ref myASG
-  #     DesiredCapacity: 1
-  #     Recurrence: '0 20 * * *'

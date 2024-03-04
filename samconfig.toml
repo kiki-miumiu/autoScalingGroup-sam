@@ -1,1 +1,12 @@
 version = 0.1
+
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "hello-world"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-sqhbt243yowe"
+s3_prefix = "hello-world"
+region = "ap-southeast-2"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "Name=\"hello-world\" EnvironmentType=\"test\" Owner=\"Platform\" LatestAmiId=\"/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2\" Subnets=\"subnet-86fd90df,subnet-92705ce4,subnet-a36a54c7\" VPCID=\"vpc-15addb71\""
